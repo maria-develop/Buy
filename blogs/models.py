@@ -48,16 +48,18 @@ class Blog(models.Model):
         verbose_name="Опубликовано",
         help_text="Признак публикации",
     )
-    views_count = models.PositiveIntegerField(
-        default=0,
-        verbose_name="Количество просмотров",
-    )
 
     author = models.ForeignKey(
         Author, on_delete=models.SET_NULL,
         related_name="blog",
         null=True, blank=True,
         related_query_name='blogs',
+    )
+
+    views_count = models.PositiveIntegerField(
+        verbose_name="Количество просмотров",
+        help_text="Укажите количество просмотров",
+        default=0,
     )
 
     def __str__(self):

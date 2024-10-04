@@ -1,6 +1,6 @@
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 from blogs.models import Blog
 
@@ -17,15 +17,15 @@ class BlogListView(ListView):
 class BlogDetailView(DetailView):
     model = Blog
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         # Получаем объект блога
-        blog = super().get_object()
+        self.object = super().get_object(queryset)
 
         # Увеличиваем счетчик просмотров
-        blog.views_count += 1
-        blog.save(update_fields=['views_count'])  # Обновляем только поле views_count
+        self.object.views_count += 1
+        self.object.save()  # Обновляем только поле views_count: (update_fields=['views_count'])
 
-        return blog
+        return self.object
 
 
 class BlogCreateView(CreateView):
@@ -38,6 +38,9 @@ class BlogUpdateView(UpdateView):
     model = Blog
     fields = ['blog_name', 'blog_content', 'blog_image', 'is_published']
     success_url = reverse_lazy('blogs:blog_list')
+
+    def get_success_url(self):
+        return reverse('blogs:blog_detail', args=[self.kwargs.get('pk')])
 
 
 class BlogDeleteView(DeleteView):

@@ -10,7 +10,7 @@
             <img src="{{ blog.blog_image | media_filter }}">
             <div class="card-body">
               <p class="card-text">Заголовок:
-                {{blog.blog_name}} {{ blog.author }}
+                {{blog.blog_name}}
               </p>
               <p class="card-text">Содержимое:
                 {{blog.blog_content|slice:":100"}}{% if blog.blog_content|length > 100 %}...{% endif %}
