@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 
 class Author(models.Model):
@@ -19,6 +20,7 @@ class Author(models.Model):
 
 
 class Blog(models.Model):
+
     blog_name = models.CharField(
         max_length=100,
         verbose_name="Заголовок",
@@ -62,6 +64,19 @@ class Blog(models.Model):
         default=0,
     )
 
+    slug = models.SlugField(
+        max_length=150,
+        unique=True,
+        verbose_name="Slug",
+        help_text="Автоматически генерируется из заголовка",
+        null=True, blank=True,
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.blog_name)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Заголовок: {self.blog_name}"
 
@@ -74,4 +89,3 @@ class Blog(models.Model):
             "is_published",
             "author"
         ]
-

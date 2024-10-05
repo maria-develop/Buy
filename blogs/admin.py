@@ -11,7 +11,11 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
-    list_display = ('id', 'blog_name', 'is_published', 'author',)
+    # list_display = ('id', 'blog_name', 'is_published', 'author',)
+    # list_filter = ('blog_name',)
+    # search_fields = ('blog_name', 'author',)
+
+    ist_display = ('id', 'blog_name', 'is_published', 'author', 'slug',)
     list_filter = ('blog_name',)
     search_fields = ('blog_name', 'author',)
-
+    prepopulated_fields = {"slug": ("blog_name",)}  # Автозаполнение slug на основе blog_name
