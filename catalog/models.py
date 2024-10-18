@@ -48,10 +48,20 @@ class Product(models.Model):
     )
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата изменения")
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL,
+        Category,
+        on_delete=models.SET_NULL,
+        verbose_name='Категория',
+        help_text='Введите категорию',
         related_name="products",
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_query_name='products',
+    )
+
+    views_count = models.PositiveIntegerField(
+        verbose_name="Количество просмотров",
+        help_text="Укажите количество просмотров",
+        default=0,
     )
 
     def __str__(self):
@@ -75,3 +85,51 @@ class Product(models.Model):
             "created_at",
             "updated_at",
         ]
+
+
+class Parent(models.Model):
+    product = models.ForeignKey(
+        Product,
+        related_name='parents',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Продукт',
+    )
+
+    product_name = models.CharField(
+        max_length=100,
+        verbose_name="Наименование товара",
+        help_text="Введите наименование товара",
+        null=True, blank=True,
+    )
+
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        verbose_name='Категория',
+        help_text='Введите категорию',
+        related_name="parents",
+        null=True,
+        blank=True,
+        related_query_name='parents_products',
+    )
+
+    year_born = models.PositiveIntegerField(
+        verbose_name='Год производства',
+        help_text='Укажите год производства',
+        default=0
+    )
+
+    class Meta:
+        verbose_name = "Родительский товар"
+        verbose_name_plural = "Родительские товары"
+        ordering = [
+            "product",
+            "product_name",
+            "category",
+            "year_born",
+        ]
+
+    def __str__(self):
+        return f"Наименование товара: {self.product_name}"
