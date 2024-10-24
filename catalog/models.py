@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 
 class Category(models.Model):
     category_name = models.CharField(
@@ -33,6 +35,7 @@ class Product(models.Model):
         upload_to="catalog/images",
         verbose_name="Фотография",
         help_text="Загрузите фото товара",
+        null=True, blank=True,
     )
     product_price = models.DecimalField(
         max_digits=10,
@@ -41,11 +44,18 @@ class Product(models.Model):
         help_text="Введите цену товара",
         null=True, blank=True,
     )
+
     created_at = models.DateField(
+        auto_now_add=True,
         verbose_name="Дата создания",
         null=True, blank=True,
         help_text="Укажите дату создания",
     )
+    # created_at = models.DateField(
+    #     verbose_name="Дата создания",
+    #     null=True, blank=True,
+    #     help_text="Укажите дату создания",
+    # )
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата изменения")
     category = models.ForeignKey(
         Category,
@@ -62,6 +72,13 @@ class Product(models.Model):
         verbose_name="Количество просмотров",
         help_text="Укажите количество просмотров",
         default=0,
+    )
+    owner = models.ForeignKey(
+        User,
+        verbose_name='Владелец',
+        help_text='Укажите владельца продукта',
+        blank=True, null=True,
+        on_delete=models.SET_NULL,
     )
 
     def __str__(self):

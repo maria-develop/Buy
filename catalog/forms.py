@@ -22,8 +22,8 @@ class ProductForm(StyleFormMixin, ModelForm):
                                    'полиция', 'радар']
     class Meta:
         model = Product
-        # exclude = ("views_count",)
-        fields = "__all__"
+        exclude = ("views_count", 'owner')
+        # fields = "__all__"
         # fields = ['product_name', 'category', 'product_description', 'product_image', 'product_price', 'created_at', 'category']
 
     def clean_product_name(self):
