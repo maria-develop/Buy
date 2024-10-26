@@ -47,6 +47,13 @@ class ProductForm(StyleFormMixin, ModelForm):
         return price
 
 
+class ProductModeratorForm(ModelForm, StyleFormMixin):
+    class Meta:
+        model = Product
+        # fields = "__all__"
+        fields = ('is_published',)
+
+
 class ParentForm(StyleFormMixin, ModelForm):
     class Meta:
         model = Parent

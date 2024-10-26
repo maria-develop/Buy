@@ -21,6 +21,24 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    # UNPUBLISHED = 'unpublished'
+    # PUBLISHED = 'published'
+    # ARCHIVED = 'archived'
+    #
+    # STATUS_CHOICES = [
+    #     (UNPUBLISHED, 'Не опубликовано'),
+    #     (PUBLISHED, 'Опубликовано'),
+    #     (ARCHIVED, 'В архиве'),
+    # ]
+    #
+    # status = models.CharField(
+    #     max_length=20,
+    #     choices=STATUS_CHOICES,
+    #     default=UNPUBLISHED,
+    # )
+
+    is_published = models.BooleanField(default=False)
+
     product_name = models.CharField(
         max_length=100,
         verbose_name="Наименование товара",
@@ -51,11 +69,7 @@ class Product(models.Model):
         null=True, blank=True,
         help_text="Укажите дату создания",
     )
-    # created_at = models.DateField(
-    #     verbose_name="Дата создания",
-    #     null=True, blank=True,
-    #     help_text="Укажите дату создания",
-    # )
+
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата изменения")
     category = models.ForeignKey(
         Category,
@@ -101,6 +115,10 @@ class Product(models.Model):
             "category",
             "created_at",
             "updated_at",
+        ]
+        permissions = [
+            ('can_unpublish_product', 'Can unpublish product'),
+            ('can_delete_product', 'Can delete product'),
         ]
 
 

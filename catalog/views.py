@@ -1,14 +1,15 @@
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.forms import inlineformset_factory
 
 from django.db import models
-from catalog.forms import ProductForm, ParentForm
+from catalog.forms import ProductForm, ParentForm, ProductModeratorForm
 from catalog.models import Product, Parent
 
 
@@ -43,6 +44,13 @@ class ProductListView(ListView):
 class ProductDetailView(DetailView, LoginRequiredMixin):
     model = Product
 
+    # def get_object(self, queryset=None):
+    #     self.object = super().get_object(queryset)
+    #     if self.request.user == self.object.owner:
+    #         self.object.save()
+    #         return self.object
+    #     raise PermissionDenied
+
 
 class ProductCreateView(CreateView, LoginRequiredMixin):
     model = Product
@@ -58,7 +66,7 @@ class ProductCreateView(CreateView, LoginRequiredMixin):
         return super().form_valid(form)
 
 
-class ProductUpdateView(UpdateView, LoginRequiredMixin):
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
     # fields = ['product_name', 'category', 'product_description', 'product_image', 'product_price', 'created_at']
@@ -87,6 +95,14 @@ class ProductUpdateView(UpdateView, LoginRequiredMixin):
         else:
             return self.render_to_response(self.get_context_data(form=form, formset=formset))
 
+    def get_form_class(self):
+        user = self.request.user
+        if user == self.object.owner:
+            return ProductForm
+        elif user.has_perm('catalog.can_unpublish_product'):
+            return ProductModeratorForm
+        raise PermissionDenied('Нет прав для редактирования')
+
 
 class ProductDeleteView(DeleteView, LoginRequiredMixin):
     model = Product
@@ -98,3 +114,10 @@ class ProductDeleteView(DeleteView, LoginRequiredMixin):
         product.owner = user
         product.save()
         return super().form_valid(form)
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.request.user == self.object.owner or self.request.user.has_perm('catalog.can_delete_product'):
+            self.object.save()
+            return self.object
+        raise PermissionDenied
