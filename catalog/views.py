@@ -1,16 +1,16 @@
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden
 from django.forms import inlineformset_factory
 
-from django.db import models
 from catalog.forms import ProductForm, ParentForm, ProductModeratorForm
-from catalog.models import Product, Parent
+from catalog.models import Product, Parent, Category
+from catalog.services import get_products_from_cache, get_products_by_category
 
 
 class HomeView(TemplateView):
@@ -39,6 +39,19 @@ class ContactView(View):
 
 class ProductListView(ListView):
     model = Product
+
+    def get_queryset(self):
+        return get_products_from_cache()
+
+
+class ProductsByCategoryView(View):
+    """Отображает список продуктов в указанной категории"""
+
+    def get(self, request, category_id):
+        category = get_object_or_404(Category, id=category_id)  # Используем id вместо category_id
+        products = get_products_by_category(category_id)
+
+        return render(request, 'catalog/products_by_category.html', {'category': category, 'products': products})
 
 
 class ProductDetailView(DetailView, LoginRequiredMixin):
