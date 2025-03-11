@@ -1,0 +1,28 @@
+{% extends 'catalog/base.html' %}
+{% block content %}
+<h1>Категория: {{ category.category_name }}</h1>
+<p>{{ category.category_description }}</p>
+
+{% if products %}
+    <div class="album py-5 bg-body-tertiary">
+        <div class="container">
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for product in products %}
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                            <div class="card-body">
+                                <p class="card-text">Наименование: {{ product.product_name }}</p>
+                                <p class="card-text">Описание: {{ product.product_description|slice:":100" }}{% if product.product_description|length > 100 %}...{% endif %}</p>
+                                <a class="btn btn-primary" href="{% url 'catalog:products_detail' product.pk %}">Посмотреть</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    <p>В этой категории нет доступных товаров.</p>
+{% endif %}
+{% endblock %}
